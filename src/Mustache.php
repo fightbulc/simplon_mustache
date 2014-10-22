@@ -114,8 +114,11 @@ class Mustache
 
             else
             {
-                // set vars
-                $template = str_replace('{{' . $key . '}}', $val, $template);
+                // set var: unescaped
+                $template = str_replace('{{{' . $key . '}}}', $val, $template);
+
+                // set var: escaped
+                $template = str_replace('{{' . $key . '}}', htmlspecialchars($val), $template);
             }
         }
 
