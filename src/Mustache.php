@@ -38,7 +38,7 @@ class Mustache
     {
         foreach ($data as $key => $val)
         {
-            if (is_array($val))
+            if (is_array($val) && empty($val) === false)
             {
                 // find loops
                 preg_match_all('|{{#' . $key . '}}(.*?){{/' . $key . '}}|sm', $template, $foreachPattern);
@@ -78,7 +78,7 @@ class Mustache
 
             // ----------------------------------
 
-            elseif (is_bool($val))
+            elseif (is_bool($val) || empty($val) === true)
             {
                 // determine true/false
                 $conditionChar = $val === true ? '\#' : '\^';
