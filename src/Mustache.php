@@ -15,7 +15,7 @@ class Mustache
     private static $data;
 
     /**
-     * @param $template
+     * @param string $template
      * @param array $data
      *
      * @return string
@@ -29,7 +29,27 @@ class Mustache
         $template = self::parse($template, $data);
 
         // clean left overs and reset data
-        return self::cleanUp($template);
+        return self::finaliseTemplate($template);
+    }
+
+    /**
+     * @param $pathTemplate
+     * @param array $data
+     *
+     * @return string
+     * @throws MustacheException
+     */
+    public static function renderByFile($pathTemplate, array $data)
+    {
+        // make sure the file exists
+        if (file_exists($pathTemplate) === true)
+        {
+            $template = file_get_contents($pathTemplate);
+
+            return self::render($template, $data);
+        }
+
+        throw new MustacheException('Missing given template file: ' . $pathTemplate);
     }
 
     /**
@@ -134,11 +154,8 @@ class Mustache
      *
      * @return string
      */
-    private static function cleanUp($template)
+    private static function finaliseTemplate($template)
     {
-        // reset data
-        self::$data = [];
-
         // remove left over wrappers
         $template = preg_replace('|{{.*?}}.*?{{/.*?}}\n*|s', '', $template);
 
