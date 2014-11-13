@@ -22,10 +22,14 @@ class Mustache
      */
     public static function render($template, array $data)
     {
+        // cache data
         self::$data = $data;
+
+        // parse template
         $template = self::parse($template, $data);
 
-        return self::cleanTemplate($template);
+        // clean left overs and reset data
+        return self::cleanUp($template);
     }
 
     /**
@@ -130,8 +134,11 @@ class Mustache
      *
      * @return string
      */
-    private static function cleanTemplate($template)
+    private static function cleanUp($template)
     {
+        // reset data
+        self::$data = [];
+
         // remove left over wrappers
         $template = preg_replace('|{{.*?}}.*?{{/.*?}}\n*|s', '', $template);
 
