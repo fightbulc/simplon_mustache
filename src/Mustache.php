@@ -38,28 +38,32 @@ class Mustache
     }
 
     /**
-     * @param $pathTemplate
+     * @param string $pathTemplate
      * @param array $data
+     * @param string $fileExtension
      *
      * @return string
      * @throws MustacheException
      */
-    public static function renderByFile($pathTemplate, array $data)
+    public static function renderByFile($pathTemplate, array $data, $fileExtension = '.mustache')
     {
+        // set file name
+        $fileName = $pathTemplate . $fileExtension;
+
         if (isset(self::$templates[$pathTemplate]) === false)
         {
             // make sure the file exists
-            if (file_exists($pathTemplate) === false)
+            if (file_exists($fileName) === false)
             {
-                throw new MustacheException('Missing given template file: ' . $pathTemplate);
+                throw new MustacheException('Missing given template file: ' . $fileName);
             }
 
             // fetch template
-            $template = file_get_contents($pathTemplate);
+            $template = file_get_contents($fileName);
 
             if ($template === false)
             {
-                throw new MustacheException('Could not load template file: ' . $pathTemplate);
+                throw new MustacheException('Could not load template file: ' . $fileName);
             }
 
             // cache template
