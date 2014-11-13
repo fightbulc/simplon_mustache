@@ -15,6 +15,11 @@ class Mustache
     private static $data;
 
     /**
+     * @var array
+     */
+    private static $templates = [];
+
+    /**
      * @param string $template
      * @param array $data
      *
@@ -41,15 +46,27 @@ class Mustache
      */
     public static function renderByFile($pathTemplate, array $data)
     {
-        // make sure the file exists
-        if (file_exists($pathTemplate) === true)
+        if (isset(self::$templates[$pathTemplate]) === false)
         {
+            // make sure the file exists
+            if (file_exists($pathTemplate) === false)
+            {
+                throw new MustacheException('Missing given template file: ' . $pathTemplate);
+            }
+
+            // fetch template
             $template = file_get_contents($pathTemplate);
 
-            return self::render($template, $data);
+            if ($template === false)
+            {
+                throw new MustacheException('Could not load template file: ' . $pathTemplate);
+            }
+
+            // cache template
+            self::$templates[$pathTemplate] = $template;
         }
 
-        throw new MustacheException('Missing given template file: ' . $pathTemplate);
+        return self::render(self::$templates[$pathTemplate], $data);
     }
 
     /**
