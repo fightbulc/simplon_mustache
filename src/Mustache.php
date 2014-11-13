@@ -34,7 +34,7 @@ class Mustache
      *
      * @return string
      */
-    protected static function parse($template, array $data)
+    private static function parse($template, array $data)
     {
         foreach ($data as $key => $val)
         {
@@ -130,7 +130,7 @@ class Mustache
      *
      * @return string
      */
-    protected static function cleanTemplate($template)
+    private static function cleanTemplate($template)
     {
         // remove left over wrappers
         $template = preg_replace('|{{.*?}}.*?{{/.*?}}\n*|s', '', $template);
