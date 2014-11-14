@@ -106,6 +106,12 @@ class Mustache
                         {
                             foreach ($val as $loopVal)
                             {
+                                // make simple lists available
+                                if (is_array($loopVal) === false)
+                                {
+                                    $loopVal = ['_' => $loopVal];
+                                }
+
                                 $loopContent .= self::parse($patternContext, $loopVal);
                             }
                         }
