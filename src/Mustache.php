@@ -44,11 +44,12 @@ class Mustache
     /**
      * @param $pathTemplate
      * @param array $data
+     * @param array $customParsers
      *
      * @return string
      * @throws MustacheException
      */
-    public static function renderByFile($pathTemplate, array $data = [])
+    public static function renderByFile($pathTemplate, array $data = [], array $customParsers = [])
     {
         if (isset(self::$templates[$pathTemplate]) === false)
         {
@@ -70,7 +71,7 @@ class Mustache
             self::$templates[$pathTemplate] = $template;
         }
 
-        return self::render(self::$templates[$pathTemplate], $data);
+        return self::render(self::$templates[$pathTemplate], $data, $customParsers);
     }
 
     /**
