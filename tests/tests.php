@@ -75,3 +75,33 @@ $params = [
 ];
 
 echo \Simplon\Mustache\Mustache::render($tmpl, $params);
+
+// ----------------------------------------------
+echo '<hr>';
+
+$tmpl = '
+{{lang:group:key}}
+{{lang:group2:key2}}
+{{lang:group3:key3}}
+';
+
+$params = [];
+
+$customParser = [
+    [
+        'pattern'  => '{{lang:(.*?):(.*?)}}',
+        'callback' => function ($template, array $match)
+        {
+            foreach ($match[1] as $index => $key)
+            {
+                $langKey = 'lang:' . $match[1][$index] . ':' . $match[2][$index];
+                $langString = 'LOCALE:' . $match[1][$index] . '-' . $match[2][$index];
+                $template = str_replace('{{' . $langKey . '}}', $langString, $template);
+            }
+
+            return $template;
+        },
+    ],
+];
+
+echo \Simplon\Mustache\Mustache::render($tmpl, $params, $customParser);
