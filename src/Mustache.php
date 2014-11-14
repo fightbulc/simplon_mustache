@@ -20,12 +20,13 @@ class Mustache
     private static $templates = [];
 
     /**
-     * @param string $template
+     * @param $template
      * @param array $data
+     * @param array $customParsers
      *
      * @return string
      */
-    public static function render($template, array $data)
+    public static function render($template, array $data = [], array $customParsers = [])
     {
         // cache data
         self::$data = $data;
@@ -33,37 +34,36 @@ class Mustache
         // parse template
         $template = self::parse($template, $data);
 
+        // run custom parsers
+        $template = self::handleCustomParsers($template, $customParsers);
+
         // clean left overs and reset data
         return self::finaliseTemplate($template);
     }
 
     /**
-     * @param string $pathTemplate
+     * @param $pathTemplate
      * @param array $data
-     * @param string $fileExtension
      *
      * @return string
      * @throws MustacheException
      */
-    public static function renderByFile($pathTemplate, array $data, $fileExtension = '.mustache')
+    public static function renderByFile($pathTemplate, array $data = [])
     {
-        // set file name
-        $fileName = $pathTemplate . $fileExtension;
-
         if (isset(self::$templates[$pathTemplate]) === false)
         {
             // make sure the file exists
-            if (file_exists($fileName) === false)
+            if (file_exists($pathTemplate) === false)
             {
-                throw new MustacheException('Missing given template file: ' . $fileName);
+                throw new MustacheException('Missing given template file: ' . $pathTemplate);
             }
 
             // fetch template
-            $template = file_get_contents($fileName);
+            $template = file_get_contents($pathTemplate);
 
             if ($template === false)
             {
-                throw new MustacheException('Could not load template file: ' . $fileName);
+                throw new MustacheException('Could not load template file: ' . $pathTemplate);
             }
 
             // cache template
@@ -79,7 +79,7 @@ class Mustache
      *
      * @return string
      */
-    private static function parse($template, array $data)
+    private static function parse($template, array $data = [])
     {
         foreach ($data as $key => $val)
         {
@@ -164,6 +164,30 @@ class Mustache
 
                 // set var: escaped
                 $template = str_replace('{{' . $key . '}}', htmlspecialchars($val), $template);
+            }
+        }
+
+        return (string)$template;
+    }
+
+    /**
+     * @param string $template
+     * @param array $parsers
+     *
+     * @return string
+     */
+    private static function handleCustomParsers($template, array $parsers = [])
+    {
+        foreach ($parsers as $parser)
+        {
+            if (isset($parser['pattern']) && isset($parser['callback']))
+            {
+                preg_match_all('|' . $parser['pattern'] . '|', $template, $match);
+
+                if (isset($match[1][0]))
+                {
+                    $template = $parser['callback']($template, $match);
+                }
             }
         }
 
