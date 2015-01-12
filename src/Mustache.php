@@ -139,13 +139,21 @@ class Mustache
                 }
             }
 
+            else if (is_array($val) && empty($val) === true) {
+                // remove
+                $template = preg_replace('|{{#' . $key . '}}(.*?){{/' . $key . '}}|sm', '', $template);
+            }
+
             // ----------------------------------
 
-            elseif (is_bool($val) || empty($val) === true)
+            elseif (is_bool($val) || is_array($val) && empty($val) === true)
             {
                 // determine true/false
                 $conditionChar = $val === true ? '\#' : '\^';
+                $negationChar = $val === true ? '\^' : '\#';
 
+                // remove bools
+                $template = preg_replace('|{{' . $negationChar . $key . '}}.*?{{/' . $key . '}}\n*|s', '', $template);
                 // find bools
                 preg_match_all('|{{' . $conditionChar . $key . '}}(.*?){{/' . $key . '}}|s', $template, $boolPattern);
 
@@ -170,7 +178,8 @@ class Mustache
             elseif ($val instanceof \Closure)
             {
                 // set closure return
-                $template = str_replace('{{' . $key . '}}', $val(), $template);
+                $template = str_replace('{{{' . $key . '}}}', $val(), $template);
+                $template = str_replace('{{' . $key . '}}', htmlspecialchars($val()), $template);
             }
 
             // ----------------------------------
