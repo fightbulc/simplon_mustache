@@ -105,3 +105,49 @@ $customParser = [
 ];
 
 echo \Simplon\Mustache\Mustache::render($tmpl, $params, $customParser);
+
+// ----------------------------------------------
+echo '<hr>';
+
+$tmpl = '
+{{#foo}}
+Show some text foo. {{#bar}}Show bar.{{/bar}} Some other foo.
+{{/foo}}
+';
+
+$params = [
+    'foo' => false,
+    'bar' => false,
+];
+
+echo \Simplon\Mustache\Mustache::render($tmpl, $params);
+
+// ----------------------------------------------
+echo '<hr>';
+
+$tmpl = '
+{{#products}}
+    <div>
+    {{#_}}
+        {{label}}
+    {{/_}}
+    </div>
+{{/products}}
+';
+
+$params = [
+    'products' => [
+        [
+            ['label' => 'Snickers'],
+            ['label' => 'Mars'],
+            ['label' => 'Twix'],
+        ],
+        [
+            ['label' => 'Snickers2'],
+            ['label' => 'Mars2'],
+            ['label' => 'Twix2'],
+        ],
+    ]
+];
+
+echo \Simplon\Mustache\Mustache::render($tmpl, $params);

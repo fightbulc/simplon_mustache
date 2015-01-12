@@ -112,6 +112,12 @@ class Mustache
                                     $loopVal = ['_' => $loopVal];
                                 }
 
+                                // iterate through two-dimensional lists
+                                if (is_array($loopVal) === true && isset($loopVal[0]))
+                                {
+                                    $loopVal = ['_' => $loopVal];
+                                }
+
                                 $loopContent .= self::parse($patternContext, $loopVal);
                             }
                         }
