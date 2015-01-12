@@ -139,7 +139,8 @@ class Mustache
                 }
             }
 
-            else if (is_array($val) && empty($val) === true) {
+            else if (is_array($val) && empty($val) === true)
+            {
                 // remove
                 $template = preg_replace('|{{#' . $key . '}}(.*?){{/' . $key . '}}|sm', '', $template);
             }
@@ -148,12 +149,13 @@ class Mustache
 
             elseif (is_bool($val) || is_array($val) && empty($val) === true)
             {
-                // determine true/false
+                // determine conditional char
                 $conditionChar = $val === true ? '\#' : '\^';
                 $negationChar = $val === true ? '\^' : '\#';
 
                 // remove bools
                 $template = preg_replace('|{{' . $negationChar . $key . '}}.*?{{/' . $key . '}}\n*|s', '', $template);
+
                 // find bools
                 preg_match_all('|{{' . $conditionChar . $key . '}}(.*?){{/' . $key . '}}|s', $template, $boolPattern);
 
