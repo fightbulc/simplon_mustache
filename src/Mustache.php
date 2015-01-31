@@ -186,7 +186,7 @@ class Mustache
 
             // ----------------------------------
 
-            else
+            elseif (gettype($val) !== 'object')
             {
                 // set var: unescaped
                 $template = str_replace('{{{' . $key . '}}}', $val, $template);
