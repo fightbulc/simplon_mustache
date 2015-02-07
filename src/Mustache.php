@@ -37,8 +37,7 @@ class Mustache
         // run custom parsers
         $template = self::handleCustomParsers($template, $customParsers);
 
-        // clean left overs and reset data
-        return self::finaliseTemplate($template);
+        return $template;
     }
 
     /**
@@ -80,6 +79,22 @@ class Mustache
     }
 
     /**
+     * @param string $template
+     *
+     * @return string
+     */
+    public static function cleanTemplate($template)
+    {
+        // remove left over wrappers
+        $template = preg_replace('|{{.*?}}.*?{{/.*?}}\n*|s', '', $template);
+
+        // remove left over variables
+        $template = preg_replace('|{{.*?}}\n*|s', '', $template);
+
+        return (string)$template;
+    }
+
+    /**
      * @param $template
      * @param array $data
      *
@@ -91,8 +106,8 @@ class Mustache
         {
             if (is_array($val) && empty($val) === false)
             {
-                // find loops
-                preg_match_all('|{{#' . $key . '}}(.*?){{/' . $key . '}}|sm', $template, $foreachPattern);
+                // find loops with all newsline symbols
+                preg_match_all('|{{#' . $key . '}}(.*?){{/' . $key . '}}\n*|sm', $template, $foreachPattern);
 
                 // handle loops
                 if (isset($foreachPattern[1][0]))
@@ -118,7 +133,8 @@ class Mustache
                                     $loopVal = ['_' => $loopVal];
                                 }
 
-                                $loopContent .= self::parse($patternContext, $loopVal);
+                                // trim the loop content and add a new line symbol for plain text
+                                $loopContent .= self::parse(trim($patternContext) . "\n", $loopVal);
                             }
                         }
 
@@ -131,7 +147,7 @@ class Mustache
                         // replace pattern context
                         $template = preg_replace(
                             '|' . preg_quote($foreachPattern[0][$patternId]) . '|s',
-                            $loopContent,
+                            $loopContent . "\n", // plain text gets one empty line after loop
                             $template,
                             1
                         );
@@ -219,22 +235,6 @@ class Mustache
                 }
             }
         }
-
-        return (string)$template;
-    }
-
-    /**
-     * @param string $template
-     *
-     * @return string
-     */
-    private static function finaliseTemplate($template)
-    {
-        // remove left over wrappers
-        $template = preg_replace('|{{.*?}}.*?{{/.*?}}\n*|s', '', $template);
-
-        // remove left over variables
-        $template = preg_replace('|{{.*?}}\n*|s', '', $template);
 
         return (string)$template;
     }
