@@ -134,7 +134,7 @@ class Mustache
                                 }
 
                                 // trim the loop content and add a new line symbol for plain text
-                                $loopContent .= self::parse(trim($patternContext) . "\n", $loopVal);
+                                $loopContent .= self::parse(preg_replace('/(^\s*|\n$)/u', '', $patternContext) . "\n", $loopVal);
                             }
                         }
 
@@ -158,7 +158,7 @@ class Mustache
             else if (is_array($val) && empty($val) === true)
             {
                 // remove
-                $template = preg_replace('|{{#' . $key . '}}(.*?){{/' . $key . '}}|sm', '', $template);
+                $template = preg_replace('|{{#' . $key . '}}(.*?){{/' . $key . '}}\n*|sm', '', $template);
             }
 
             // ----------------------------------
